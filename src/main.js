@@ -18,7 +18,6 @@ async function reposition() {
     await currentWindow.setPosition(new tauriWindow.PhysicalPosition(x, y));
   }
 }
-reposition();
 
 /* Notification Request */
 const tauriNotification = window.__TAURI__.notification;
@@ -34,7 +33,7 @@ async function requestNotifications() {
 /* Tauri Store Load */
 const { load } = window.__TAURI__.store;
 const tauriStore = await load('store.json', { autoSave: false });
-const storeMap = {};
+const storeMap = JSON.parse(localStorage.getItem("tauri_store_map") || "{}");
 const populateStoreMap = async () => {
   const storeEntries = (await tauriStore.entries());
   storeEntries.forEach(entry => { storeMap[entry[0]] = entry[1] });
@@ -60,7 +59,7 @@ let currentIntentInd = 0;
 
 /* App Autostart settings */
 const tauriAutostart = window.__TAURI__.autostart;
-async function toggleAutostart(enable) {
+async function setAutostart(enable) {
   if (enable && !await tauriAutostart.isEnabled()) {
     await tauriAutostart.enable();
   }
@@ -154,9 +153,14 @@ const setTheme = () => {
   const snoozeSvg = document.getElementById('snooze-icon');
   const nextSvg = document.getElementById('next-icon');
   const aboutSvg = document.getElementById('about-icon');
-  [settingsSvg, backSvg, snoozeSvg, aboutSvg, nextSvg].forEach((icon) => {
+  Array.from([settingsSvg, backSvg, aboutSvg]).forEach((icon) => {
     if (icon) {
       icon.style.fill = vars['color-icon-button'];
+    }
+  })
+  Array.from([snoozeSvg, nextSvg]).forEach((icon) => {
+    if (icon) {
+      icon.style.fill = vars['color-text'];
     }
   })
 
@@ -171,8 +175,15 @@ const setTheme = () => {
 
 setTheme();
 await populateStoreMap();
-toggleAutostart(storeMap.autostart_setting === 'enable');
-requestNotifications();
+if (!sessionStorage.getItem("app_loaded")) {
+  reposition();
+  sessionStorage.setItem("app_loaded", "true");
+}
+if (!localStorage.getItem("app_loaded")) {
+  requestNotifications();
+  setAutostart(storeMap.autostart_setting === 'enable');
+  localStorage.setItem("app_loaded", "true");
+}
 
 /* Form Preset */
 const setPresets = async(isWidget = false) => {
@@ -329,7 +340,9 @@ if (form) {
 
 const switchToForm = async (e) => {
   if (e) e.stopPropagation();
-  await switchMode('FORM');
+  if (window.location.pathname.includes('widget')) {
+    await switchMode('FORM');
+  }
   window.location.replace('index.html');
 }
 
@@ -415,12 +428,12 @@ const next = async (e) => {
 
 const widgetContainer = document.getElementById('widget-container');
 if (widgetContainer) {
-  let decorationsEnabled = false;
-  widgetContainer.addEventListener('click', async (e) => {
-    decorationsEnabled = !decorationsEnabled;
-    currentWindow.setSize(new tauriWindow.LogicalSize(300, decorationsEnabled ? 120 : 70));
-    currentWindow.setDecorations(decorationsEnabled);
-  })
+  // let decorationsEnabled = false;
+  // widgetContainer.addEventListener('click', async (e) => {
+  //   decorationsEnabled = !decorationsEnabled;
+  //   currentWindow.setSize(new tauriWindow.LogicalSize(300, decorationsEnabled ? 120 : 70));
+  //   currentWindow.setDecorations(decorationsEnabled);
+  // })
   setPresets(true);
   document.getElementById('snooze-button').addEventListener('click', snooze);
   document.getElementById('next-button').addEventListener('click', next);
@@ -479,7 +492,7 @@ if (settings) {
       }
       tauriStore.save();
 
-      if (event.target.name === 'autostart') toggleAutostart(settingValue === 'enable');
+      if (event.target.name === 'autostart') setAutostart(settingValue === 'enable');
     });
   });
 
