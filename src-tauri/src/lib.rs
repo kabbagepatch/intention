@@ -1,9 +1,9 @@
-use tauri_plugin_positioner::{Position, WindowExt};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager, Runtime,
 };
+use tauri_plugin_positioner::{Position, WindowExt};
 
 pub fn tray_init<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
     let toggle = MenuItem::with_id(app, "toggle", "Show/Hide App", true, None::<&str>)?;
@@ -36,7 +36,9 @@ pub fn tray_init<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
 }
 
 fn toggle_visibility<R: Runtime>(app: &AppHandle<R>) {
-    let Some(win) = app.get_webview_window("main") else { return };
+    let Some(win) = app.get_webview_window("main") else {
+        return;
+    };
 
     let visible = win.is_visible().unwrap_or(false);
     let minimized = win.is_minimized().unwrap_or(false);
@@ -59,6 +61,7 @@ fn greet(name: &str) -> String {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_autostart::Builder::new().build())
         .setup(|app| {
