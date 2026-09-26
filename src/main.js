@@ -37,7 +37,7 @@ const storeMap = JSON.parse(localStorage.getItem("tauri_store_map") || "{}");
 const populateStoreMap = async () => {
   const storeEntries = (await tauriStore.entries());
   storeEntries.forEach(entry => { storeMap[entry[0]] = entry[1] });
-  ['widget', 'audio', 'notif', 'autostart'].forEach(s => {
+  ['widget', 'audio', 'notif', 'autostart', 'alwaysontop'].forEach(s => {
     if (!storeMap[`${s}_setting`]) {
       storeMap[`${s}_setting`] = 'enable';
       tauriStore.set(`${s}_setting`, 'enable');
@@ -178,6 +178,7 @@ await populateStoreMap();
 if (!sessionStorage.getItem("app_loaded")) {
   reposition();
   sessionStorage.setItem("app_loaded", "true");
+  currentWindow.setAlwaysOnTop(storeMap.alwaysontop_setting === 'enable')
 }
 if (!localStorage.getItem("app_loaded")) {
   requestNotifications();
@@ -464,6 +465,7 @@ if (settingsButton) {
 const setInitialSettings = async () => {
   document.getElementById('widget_enable').checked = true;
   document.getElementById('autostart_disable').checked = true;
+  document.getElementById('alwaysontop_enable').checked = true;
   document.getElementById('audio_disable').checked = true;
 
   Object.keys(storeMap).forEach(key => {
@@ -493,6 +495,7 @@ if (settings) {
       tauriStore.save();
 
       if (event.target.name === 'autostart') setAutostart(settingValue === 'enable');
+      if (event.target.name === 'alwaysontop') currentWindow.setAlwaysOnTop(settingValue === 'enable');
     });
   });
 
