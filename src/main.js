@@ -1,5 +1,14 @@
 const { invoke } = window.__TAURI__.core;
 const { defaultWindowIcon } = window.__TAURI__.app;
+const { check  } = window.__TAURI__.updater;
+
+try {
+  const update = await check();
+  console.log(update);
+} catch(e) {
+  console.log('Error');
+  console.log({e});
+}
 
 /* Window Repositioning to Corner */
 const tauriWindow = window.__TAURI__.window;
