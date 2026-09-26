@@ -1,9 +1,37 @@
-use tauri_plugin_positioner::{Position, WindowExt};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager, Runtime,
 };
+use tauri_plugin_positioner::{Position, WindowExt};
+use tauri_plugin_updater::UpdaterExt;
+
+async fn update(app: tauri::AppHandle) -> tauri_plugin_updater::Result<()> {
+    println!("Checking for updates");
+    if let Some(update) = app.updater()?.check().await? {
+    let mut downloaded = 0;
+
+    // alternatively we could also call update.download() and update.install() separately
+    update
+        .download_and_install(
+        |chunk_length, content_length| {
+            downloaded += chunk_length;
+            println!("downloaded {downloaded} from {content_length:?}");
+        },
+        || {
+            println!("download finished");
+        },
+        )
+        .await?;
+
+    println!("update installed");
+    app.restart();
+    } else {
+    println!("No update found");
+    }
+
+    Ok(())
+}
 
 pub fn tray_init<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
     let toggle = MenuItem::with_id(app, "toggle", "Show/Hide App", true, None::<&str>)?;
@@ -36,7 +64,9 @@ pub fn tray_init<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
 }
 
 fn toggle_visibility<R: Runtime>(app: &AppHandle<R>) {
-    let Some(win) = app.get_webview_window("main") else { return };
+    let Some(win) = app.get_webview_window("main") else {
+        return;
+    };
 
     let visible = win.is_visible().unwrap_or(false);
     let minimized = win.is_minimized().unwrap_or(false);
@@ -59,9 +89,20 @@ fn greet(name: &str) -> String {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_autostart::Builder::new().build())
         .setup(|app| {
+            let handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                match update(handle).await {
+                    Ok(_) => {}
+                    Err(e) => {
+                        println!("Failed check app for updates: {e}");
+                    }
+                }
+            });
             tray_init(app.handle())?;
             let win = app.get_webview_window("main").unwrap();
             let _ = win.as_ref().window().move_window(Position::BottomRight);

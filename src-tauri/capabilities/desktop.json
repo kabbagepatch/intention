@@ -11,6 +11,7 @@
   "permissions": [
     "positioner:default",
     "autostart:default",
-    "notification:default"
+    "notification:default",
+    "updater:default"
   ]
 }

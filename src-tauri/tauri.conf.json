@@ -23,6 +23,7 @@
   },
   "bundle": {
     "active": true,
+    "createUpdaterArtifacts": true,
     "targets": "all",
     "icon": [
       "icons/32x32.png",
@@ -31,5 +32,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDhCOUM1Nzg1OUFBNUNDQQpSV1RLWEtwWmVNVzVDQ3h4emJxcW9IMGZWZDE0bjk0MjgzRjBMYnRta3dsTE9KU2ZJL0ZNYVh5RQo=",
+      "endpoints": [
+        "https://github.com/kabbagepatch/intention/releases/latest/download/latest.json"
+      ]
+    }
   }
 }
