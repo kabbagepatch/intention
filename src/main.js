@@ -170,8 +170,6 @@ const setTheme = () => {
   else if (currentHour < 21) theme = 'evening';
   else theme = 'night';
 
-  theme = 'night'
-
   if (!Object.keys(themes).includes(theme)) return;
   if (curTheme === theme) return;
 
