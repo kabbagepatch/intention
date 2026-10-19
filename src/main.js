@@ -69,7 +69,7 @@ async function setAutostart(enable) {
 }
 
 /* Theme Setup */
-let themes = {
+const defaultThemes = {
   'morning': {
     'color-background-1': 'hsl(193, 69%, 88%)',
     'color-background-2': 'hsl(27, 71%, 73%)',
@@ -108,15 +108,15 @@ let themes = {
     'color-button-text': 'hsl(0, 0%, 1%)',
   },
 };
-themes = {
+const spookyThemes = {
   'morning': {
-    'color-background-1': 'hsl(193, 69%, 88%)',
-    'color-background-2': 'hsl(27, 71%, 73%)',
-    'color-background-3': 'hsl(48, 100%, 87%)',
+    'color-background-1': 'hsl(150, 46%, 95%)',
+    'color-background-2': 'hsl(28, 71%, 81%)',
+    'color-background-3': 'hsl(47, 71%, 84%)',
     'color-text': 'hsl(0, 0%, 9%)',
-    'color-shadow': 'hsl(48, 100%, 87%)',
+    'color-shadow': 'hsl(47, 71%, 84%)',
     'color-icon-button': 'hsl(0, 0%, 9%)',
-    'color-button': 'hsl(48, 100%, 87%)',
+    'color-button': 'hsl(47, 71%, 84%)',
     'color-button-text': 'hsl(0, 0%, 1%)',
   },
   'afternoon': {
@@ -147,6 +147,8 @@ themes = {
     'color-button-text': '#1f2113',
   },
 }
+
+const themes = spookyThemes;
 
 const stars = document.getElementById('stars');
 function createStars() {
@@ -208,8 +210,9 @@ const setTheme = () => {
   if (topIcon && bottomIcon) {
     switch(theme) {
       case 'morning':
-        topIcon.src = './assets/ghost.png';
-        bottomIcon.src = './assets/raven.png';
+        topIcon.src = './assets/raven.png';
+        topIcon.style.margin = '2px';
+        bottomIcon.src = './assets/ghost.png';
         break;
       case 'afternoon':
         topIcon.src = './assets/bats.png';
@@ -218,7 +221,6 @@ const setTheme = () => {
       case 'evening':
         topIcon.src = './assets/pumpkin.png';
         bottomIcon.src = './assets/cat.png';
-        bottomIcon.style.margin = '2px';
         break;
       case 'night':
         topIcon.src = './assets/moon-bats.png';

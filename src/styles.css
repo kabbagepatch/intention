@@ -312,7 +312,8 @@ input.radio {
 }
 
 #about p a {
-  color: var(--color-button)
+  color: var(--color-button);
+  text-shadow: 1px 1px 2px var(--color-text);
 }
 
 #multitask-container {
