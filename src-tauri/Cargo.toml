@@ -1,6 +1,6 @@
 [package]
 name = "intention"
-version = "0.2.2"
+version = "0.2.3"
 description = "Choose your PC session intention"
 authors = ["you"]
 edition = "2021"
