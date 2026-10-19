@@ -69,7 +69,7 @@ async function setAutostart(enable) {
 }
 
 /* Theme Setup */
-const themes = {
+let themes = {
   'morning': {
     'color-background-1': 'hsl(193, 69%, 88%)',
     'color-background-2': 'hsl(27, 71%, 73%)',
@@ -107,6 +107,45 @@ const themes = {
     'color-button': 'hsl(42, 24%, 89%)',
     'color-button-text': 'hsl(0, 0%, 1%)',
   },
+};
+themes = {
+  'morning': {
+    'color-background-1': 'hsl(193, 69%, 88%)',
+    'color-background-2': 'hsl(27, 71%, 73%)',
+    'color-background-3': 'hsl(48, 100%, 87%)',
+    'color-text': 'hsl(0, 0%, 9%)',
+    'color-shadow': 'hsl(48, 100%, 87%)',
+    'color-icon-button': 'hsl(0, 0%, 9%)',
+    'color-button': 'hsl(48, 100%, 87%)',
+    'color-button-text': 'hsl(0, 0%, 1%)',
+  },
+  'afternoon': {
+    'color-background-1': 'hsl(161, 21%, 83%)',
+    'color-background-2': 'hsl(178, 16%, 68%)',
+    'color-background-3': 'hsl(188, 22%, 34%)',
+    'color-text': 'hsl(161, 21%, 83%)',
+    'color-icon-button': 'hsl(171, 24%, 23%)',
+    'color-button': 'hsl(161, 21%, 83%)',
+    'color-button-text': 'hsl(0, 0%, 1%)',
+  },
+  'evening': {
+    'color-background-1': 'hsl(18, 71%, 62%)',
+    'color-background-2': 'hsl(4, 59%, 43%)',
+    'color-background-3': 'hsl(353, 55%, 13%)',
+    'color-text': 'hsl(0, 0%, 96%)',
+    'color-icon-button': 'hsl(353, 55%, 13%)',
+    'color-button': 'hsl(327, 43%, 8%)',
+    'color-button-text': 'hsl(0, 0%, 96%)',
+  },
+  'night': {
+    'color-background-1': '#95806b',
+    'color-background-2': '#1f2113',
+    'color-background-3': '#10100e',
+    'color-text': '#d3ccc2',
+    'color-icon-button': '#d3ccc2',
+    'color-button': '#d3ccc2',
+    'color-button-text': '#1f2113',
+  },
 }
 
 const stars = document.getElementById('stars');
@@ -130,6 +169,8 @@ const setTheme = () => {
   else if (currentHour < 18) theme = 'afternoon';
   else if (currentHour < 21) theme = 'evening';
   else theme = 'night';
+
+  theme = 'night'
 
   if (!Object.keys(themes).includes(theme)) return;
   if (curTheme === theme) return;
@@ -164,11 +205,37 @@ const setTheme = () => {
     }
   })
 
+  const topIcon = document.getElementById('top-icon');
+  const bottomIcon = document.getElementById('bottom-icon');
+  if (topIcon && bottomIcon) {
+    switch(theme) {
+      case 'morning':
+        topIcon.src = './assets/ghost.png';
+        bottomIcon.src = './assets/raven.png';
+        break;
+      case 'afternoon':
+        topIcon.src = './assets/bats.png';
+        bottomIcon.src = './assets/cat.png';
+        break;
+      case 'evening':
+        topIcon.src = './assets/pumpkin.png';
+        bottomIcon.src = './assets/cat.png';
+        bottomIcon.style.margin = '2px';
+        break;
+      case 'night':
+        topIcon.src = './assets/moon-bats.png';
+        bottomIcon.src = './assets/ghost.png';
+        break;
+    }
+  }
+
   const title = document.getElementById('greeting')
   if (title) {
     if (theme === 'night') {
       theme = 'evening';
     }
+    const parts = theme.split('-');
+    theme = parts.length > 1 ? parts[1] : parts[0];
     title.textContent = `Good ${theme[0].toUpperCase()}${theme.slice(1).toLowerCase()}!`;
   }
 }

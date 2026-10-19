@@ -343,3 +343,21 @@ input.radio {
   min-width: 60px;
   text-align: right;
 }
+
+#top-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 55px;
+  height: 55px;
+  margin: 10px;
+}
+
+#bottom-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 55px;
+  height: 55px;
+  margin: 2px;
+}
