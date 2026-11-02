@@ -138,17 +138,56 @@ const spookyThemes = {
     'color-button-text': 'hsl(0, 0%, 96%)',
   },
   'night': {
-    'color-background-1': '#95806b',
-    'color-background-2': '#1f2113',
-    'color-background-3': '#10100e',
-    'color-text': '#d3ccc2',
-    'color-icon-button': '#d3ccc2',
-    'color-button': '#d3ccc2',
-    'color-button-text': '#1f2113',
+    'color-background-1': 'hsl(30, 17%, 50%)',
+    'color-background-2': 'hsl(69, 27%, 10%)',
+    'color-background-3': 'hsl(60, 7%, 6%)',
+    'color-text': 'hsl(35, 16%, 79%)',
+    'color-icon-button': 'hsl(35, 16%, 79%)',
+    'color-button': 'hsl(35, 16%, 79%)',
+    'color-button-text': 'hsl(69, 27%, 10%)',
+  },
+}
+const fallThemes = {
+  'morning': {
+    'color-background-1': 'hsl(150, 36%, 95%)',
+    'color-background-2': 'hsl(28, 51%, 81%)',
+    'color-background-3': 'hsl(47, 51%, 84%)',
+    'color-text': 'hsl(0, 0%, 9%)',
+    'color-shadow': 'hsl(47, 51%, 84%)',
+    'color-icon-button': 'hsl(0, 0%, 9%)',
+    'color-button': 'hsl(47, 51%, 84%)',
+    'color-button-text': 'hsl(0, 0%, 1%)',
+  },
+  'afternoon': {
+    'color-background-1': 'hsl(161, 31%, 88%)',
+    'color-background-2': 'hsl(178, 26%, 78%)',
+    'color-background-3': 'hsl(188, 42%, 58%)',
+    'color-text': 'hsl(161, 31%, 95%)',
+    'color-icon-button': 'hsl(96, 24%, 23%)',
+    'color-button': 'hsl(161, 31%, 88%)',
+    'color-button-text': 'hsl(0, 0%, 1%)',
+  },
+  'evening': {
+    'color-background-1': 'hsl(36, 72%, 56%)',
+    'color-background-2': 'hsl(359, 58%, 39%)',
+    'color-background-3': 'hsl(358, 77%, 19%)',
+    'color-text': 'hsl(51, 100%, 85%)',
+    'color-icon-button': 'hsl(358, 77%, 19%)',
+    'color-button': 'hsl(358, 47%, 19%)',
+    'color-button-text': 'hsl(0, 0%, 96%)',
+  },
+  'night': {
+    'color-background-1': 'hsl(0, 2%, 74%)',
+    'color-background-2': 'hsl(252, 14%, 29%)',
+    'color-background-3': 'hsl(270, 23%, 18%)',
+    'color-text': 'hsl(15, 87%, 92%)',
+    'color-icon-button': 'hsl(252, 14%, 9%)',
+    'color-button': 'hsl(35, 16%, 79%)',
+    'color-button-text': 'hsl(252, 14%, 9%)',
   },
 }
 
-const themes = spookyThemes;
+const themes = fallThemes;
 
 const stars = document.getElementById('stars');
 function createStars() {
@@ -166,10 +205,10 @@ let curTheme = '';
 const setTheme = () => {
   let theme = 'afternoon';
   const currentHour = new Date().getHours();
-  if (currentHour < 5) theme = 'night';
+  if (currentHour < 6) theme = 'night';
   else if (currentHour < 12) theme = 'morning';
-  else if (currentHour < 18) theme = 'afternoon';
-  else if (currentHour < 21) theme = 'evening';
+  else if (currentHour < 16) theme = 'afternoon';
+  else if (currentHour < 19) theme = 'evening';
   else theme = 'night';
 
   if (!Object.keys(themes).includes(theme)) return;
@@ -210,21 +249,20 @@ const setTheme = () => {
   if (topIcon && bottomIcon) {
     switch(theme) {
       case 'morning':
-        topIcon.src = './assets/raven.png';
-        topIcon.style.margin = '2px';
-        bottomIcon.src = './assets/ghost.png';
+        topIcon.src = './assets/fall/leaves.png';
+        bottomIcon.src = './assets/fall/cup.png';
         break;
       case 'afternoon':
-        topIcon.src = './assets/bats.png';
-        bottomIcon.src = './assets/cat.png';
+        topIcon.src = './assets/fall/autumn-leaves.png';
+        bottomIcon.src = './assets/fall/maple-leaf.png';
         break;
       case 'evening':
-        topIcon.src = './assets/pumpkin.png';
-        bottomIcon.src = './assets/cat.png';
+        topIcon.src = './assets/fall/mushroom.png';
+        bottomIcon.src = './assets/fall/pumpkin.png';
         break;
       case 'night':
-        topIcon.src = './assets/moon-bats.png';
-        bottomIcon.src = './assets/ghost.png';
+        topIcon.src = './assets/fall/moon-bats.png';
+        bottomIcon.src = './assets/fall/drink.png';
         break;
     }
   }
