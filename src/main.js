@@ -1,35 +1,6 @@
 const { invoke } = window.__TAURI__.core;
 const { defaultWindowIcon } = window.__TAURI__.app;
 
-/* Window Repositioning to Corner */
-const tauriWindow = window.__TAURI__.window;
-const currentWindow = tauriWindow.getCurrentWindow();
-async function reposition() {
-  const monitors = await tauriWindow.availableMonitors();
-  let monitor = monitors[0];
-  const currentMonitor = await tauriWindow.currentMonitor();
-  if (!monitor) monitor = currentMonitor;
-  if (monitor) {
-    const workAreaPosition = monitor.workArea.position;
-    const workAreaSize = monitor.workArea.size;
-    const windowSize = await currentWindow.outerSize();
-    const x = workAreaPosition.x + workAreaSize.width - Math.floor(windowSize.width * monitor.scaleFactor / currentMonitor.scaleFactor);
-    const y = workAreaPosition.y + workAreaSize.height - Math.floor(windowSize.height * monitor.scaleFactor / currentMonitor.scaleFactor);
-    await currentWindow.setPosition(new tauriWindow.PhysicalPosition(x, y));
-  }
-}
-
-/* Notification Request */
-const tauriNotification = window.__TAURI__.notification;
-let notifPermissionGranted = false;
-async function requestNotifications() {
-  notifPermissionGranted = await tauriNotification.isPermissionGranted();
-  if (!notifPermissionGranted) {
-    const permission = await tauriNotification.requestPermission();
-    notifPermissionGranted = permission === 'granted';
-  }
-}
-
 /* Tauri Store Load */
 const { load } = window.__TAURI__.store;
 const tauriStore = await load('store.json', { autoSave: false });
@@ -53,9 +24,43 @@ const populateStoreMap = async () => {
   }
   if (!storeMap.intents) storeMap.intents = [];
   if (!storeMap.intentIndex) storeMap.intentIndex = 0;
+  if (!storeMap.monitorIndex) storeMap.monitorIndex = 0;
   tauriStore.save();
+  localStorage.setItem("tauri_store_map", JSON.stringify(storeMap));
 }
 let currentIntentInd = 0;
+await populateStoreMap();
+
+/* Window Repositioning to Corner */
+const tauriWindow = window.__TAURI__.window;
+const currentWindow = tauriWindow.getCurrentWindow();
+let monitors = await tauriWindow.availableMonitors();
+async function reposition() {
+  monitors = await tauriWindow.availableMonitors();
+  let monitor;
+  if (monitors.length > 0) monitor = monitors[storeMap.monitorIndex < monitors.length ? storeMap.monitorIndex : 0];
+  const currentMonitor = await tauriWindow.currentMonitor();
+  if (!monitor) monitor = currentMonitor;
+  if (monitor && currentMonitor) {
+    const workAreaPosition = monitor.workArea.position;
+    const workAreaSize = monitor.workArea.size;
+    const windowSize = await currentWindow.outerSize();
+    const x = workAreaPosition.x + workAreaSize.width - Math.floor(windowSize.width * monitor.scaleFactor / currentMonitor.scaleFactor);
+    const y = workAreaPosition.y + workAreaSize.height - Math.floor(windowSize.height * monitor.scaleFactor / currentMonitor.scaleFactor);
+    await currentWindow.setPosition(new tauriWindow.PhysicalPosition(x, y));
+  }
+}
+
+/* Notification Request */
+const tauriNotification = window.__TAURI__.notification;
+let notifPermissionGranted = false;
+async function requestNotifications() {
+  notifPermissionGranted = await tauriNotification.isPermissionGranted();
+  if (!notifPermissionGranted) {
+    const permission = await tauriNotification.requestPermission();
+    notifPermissionGranted = permission === 'granted';
+  }
+}
 
 /* App Autostart settings */
 const tauriAutostart = window.__TAURI__.autostart;
@@ -279,7 +284,6 @@ const setTheme = () => {
 }
 
 setTheme();
-await populateStoreMap();
 if (!sessionStorage.getItem("app_loaded")) {
   reposition();
   sessionStorage.setItem("app_loaded", "true");
@@ -611,5 +615,16 @@ if (settings) {
     storeMap.snooze_duration = snoozeValue;
     tauriStore.set('snooze_duration', snoozeValue);
     tauriStore.save();
+  })
+
+  const monitorSelect = document.getElementById('monitor-select');
+  monitorSelect.innerHTML = monitors.map((_, i) => `<option value=${i}>${i + 1}</option>`)
+  monitorSelect.value = storeMap.monitorIndex;
+  monitorSelect.addEventListener('input', async (event) => {
+    const newMonitor = parseInt(event.target.value, 10);
+    storeMap.monitorIndex = newMonitor;
+    tauriStore.set('monitorIndex', newMonitor);
+    tauriStore.save();
+    reposition();
   })
 }
